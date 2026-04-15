@@ -1,0 +1,21 @@
+# ══════════════════════════════════════════════════════════════
+#  AFS Controller — Level 4 — Dependencies
+# ══════════════════════════════════════════════════════════════
+#  Python >= 3.10
+#
+#  Cài đặt:  pip install -r requirements.txt
+# ══════════════════════════════════════════════════════════════
+
+# ── Core controller ──────────────────────────────────────────
+# afs.py chỉ dùng standard library (math, dataclasses).
+# Không cần cài gì để chạy controller.
+
+# ── Dashboard server ─────────────────────────────────────────
+flask>=3.0
+
+# ── Visualization (tuỳ chọn — dùng khi muốn plot offline) ──
+matplotlib>=3.5
+numpy>=1.22
+
+# ── Data logging (tuỳ chọn — dùng khi ghi CSV) ──────────────
+pandas>=1.4
