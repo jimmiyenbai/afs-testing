@@ -101,6 +101,7 @@ Bộ lọc thông thấp bậc 1 dùng hằng số thời gian τ = 60 ms. Tần
 
 **Bước 4 — Preview time.**
 tₚ = 0.09 + 33.689/V [s], clamp vào [0.6, 2.8]. Công thức từ Ishiguro & Yamada (SAE 2004-01-0441).
+preview time là thời gian nhìn trước của đèn
 
 **Bước 5 — Góc xoay đèn.**
 θ_yaw = atan(v · tₚ · κ), clamp vào ±15°.

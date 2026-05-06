@@ -151,7 +151,7 @@ header span{font-size:12px;color:var(--dim);font-family:'JetBrains Mono',monospa
   <!-- Main 3-column layout: [Controls] [Yaw viz] [Pitch viz] -->
   <div class="main-grid">
 
-    <!-- LEFT COLUMN: Preset + Input -->
+<!-- LEFT COLUMN: Preset + Input -->
     <div class="controls-column">
       <div class="card">
         <h2>Preset</h2>
