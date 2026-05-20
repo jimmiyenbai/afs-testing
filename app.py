@@ -195,37 +195,60 @@ header span{font-size:12px;color:var(--dim);font-family:'JetBrains Mono',monospa
           <button type="button" class="btn" id="btn-reset">Reset</button>
         </div>
       </div>
+      <div class="card">
+        <h2>Xe đối diện</h2>
+        <div class="presets" id="oncoming-bar" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div>
+        <p class="config-note" style="margin-top:10px">Preset khoảng cách dùng chung một tỉ lệ dọc: 20 / 30 / 60 m. Chùm chính kết thúc tại 60 m.</p>
+      </div>
     </div>
 
     <!-- MIDDLE COLUMN: Yaw visualization -->
     <div class="card viz-card">
       <div class="car-viz">
         <div class="viz-title">Nhìn trên — Yaw</div>
-        <svg id="yaw-svg" class="viz-svg" viewBox="70 15 260 390">
+        <svg id="yaw-svg" class="viz-svg" viewBox="80 72 360 600" preserveAspectRatio="xMidYMid meet">
           <defs>
-            <radialGradient id="beam-grad" cx="50%" cy="100%" r="70%" fx="50%" fy="100%">
-              <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.5"/>
-              <stop offset="60%" stop-color="#22d3ee" stop-opacity="0.15"/>
-              <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+            <linearGradient id="road-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#233040" stop-opacity="0.82"/>
+              <stop offset="100%" stop-color="#1a2533" stop-opacity="0.92"/>
+            </linearGradient>
+            <radialGradient id="beam-main-grad" cx="38%" cy="100%" r="98%">
+              <stop offset="0%" stop-color="#ffe08a" stop-opacity="0.70"/>
+              <stop offset="38%" stop-color="#ffd166" stop-opacity="0.58"/>
+              <stop offset="72%" stop-color="#f4c542" stop-opacity="0.30"/>
+              <stop offset="100%" stop-color="#f4c542" stop-opacity="0.10"/>
             </radialGradient>
+            <radialGradient id="beam-far-grad" cx="45%" cy="100%" r="100%">
+              <stop offset="0%" stop-color="#f4d35e" stop-opacity="0.22"/>
+              <stop offset="100%" stop-color="#f4d35e" stop-opacity="0.03"/>
+            </radialGradient>
+            <filter id="beam-glow" x="-25%" y="-25%" width="150%" height="150%">
+              <feGaussianBlur stdDeviation="2" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
           </defs>
-          <g id="beam-left-group">
-            <path id="beam-left-fan" d="" fill="url(#beam-grad)" opacity="0.5"/>
-            <line id="beam-left-center" x1="188" y1="361" x2="188" y2="30" stroke="#22d3ee" stroke-width="0.9" stroke-dasharray="6 4" opacity="0.45"/>
-          </g>
-          <g id="beam-right-group">
-            <path id="beam-right-fan" d="" fill="url(#beam-grad)" opacity="0.5"/>
-            <line id="beam-right-center" x1="212" y1="361" x2="212" y2="30" stroke="#22d3ee" stroke-width="0.9" stroke-dasharray="6 4" opacity="0.45"/>
-          </g>
-          <path id="yaw-arc" d="" fill="none" stroke="#22d3ee" stroke-width="1.5" opacity="0.7"/>
-          <text id="yaw-angle-text" x="200" y="240" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono,monospace" font-size="18" font-weight="600" opacity="0.9"></text>
-          <text id="yaw-arrow" x="200" y="224" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono,monospace" font-size="14" opacity="0.7"></text>
-          <line x1="200" y1="380" x2="200" y2="30" stroke="#6b7a8d" stroke-width="0.5" stroke-dasharray="3 6" opacity="0.3"/>
-          <rect x="178" y="362" width="44" height="30" rx="4" fill="none" stroke="#6b7a8d" stroke-width="1.5"/>
-          <rect x="183" y="358" width="10" height="6" rx="2" fill="#f59e0b" opacity="0.8"/>
-          <rect x="207" y="358" width="10" height="6" rx="2" fill="#f59e0b" opacity="0.8"/>
-          <line x1="120" y1="30" x2="120" y2="400" stroke="#6b7a8d" stroke-width="0.5" stroke-dasharray="8 8" opacity="0.15"/>
-          <line x1="280" y1="30" x2="280" y2="400" stroke="#6b7a8d" stroke-width="0.5" stroke-dasharray="8 8" opacity="0.15"/>
+
+          <!-- road is now drawn dynamically so turning cases are visible in the top view -->
+          <path id="road-fill" d="" fill="url(#road-grad)" stroke="#334155" stroke-width="1.5"/>
+          <path id="road-left-edge" d="" fill="none" stroke="#506074" stroke-width="1" opacity="0.75"/>
+          <path id="road-right-edge" d="" fill="none" stroke="#506074" stroke-width="1" opacity="0.75"/>
+          <path id="lane-center" d="" fill="none" stroke="#f4d35e" stroke-width="3" stroke-dasharray="28 24" opacity="0.95"/>
+
+          <g id="distance-scale" font-family="JetBrains Mono,monospace" font-size="11" fill="#93a4bb" opacity="0.92"></g>
+          <g id="road-distance-guides" stroke="#93a4bb" stroke-width="0.6" stroke-dasharray="3 7" opacity="0.22"></g>
+
+          <path id="beam-far-shape" d="" fill="url(#beam-far-grad)" stroke="#f4d35e" stroke-width="1" opacity="0.70" filter="url(#beam-glow)"/>
+          <path id="beam-main-shape" d="" fill="url(#beam-main-grad)" stroke="#ffe08a" stroke-width="1.5" opacity="0.95" filter="url(#beam-glow)"/>
+          <path id="beam-cutoff-line" d="" fill="none" stroke="#ffe08a" stroke-width="1.4" stroke-dasharray="8 6" opacity="0"/>
+          <line id="beam-axis-line" x1="0" y1="0" x2="0" y2="0" stroke="#ffe08a" stroke-width="1.4" stroke-dasharray="8 8" opacity="0"/>
+          <g id="beam-marks" font-family="JetBrains Mono,monospace" font-size="10" font-weight="700"></g>
+
+          <g id="oncoming-car"></g>
+          <g id="own-car"></g>
+
+          <path id="yaw-arc" d="" fill="none" stroke="#22d3ee" stroke-width="1.5" opacity="0.8"/>
+          <text id="yaw-angle-text" x="330" y="570" text-anchor="middle" fill="#22d3ee" font-family="JetBrains Mono,monospace" font-size="22" font-weight="700" opacity="0.95">0°</text>
+          <text id="beam-status-text" x="90" y="650" fill="#10b981" font-family="JetBrains Mono,monospace" font-size="11" font-weight="700"></text>
         </svg>
         <div class="yaw-label yaw-pitch-label" id="viz-pitch-badge"></div>
       </div>
@@ -445,14 +468,20 @@ const CONFIG_FIELDS = [
 ];
 
 const PRESETS = [
-  { name: 'Đi thẳng 60 km/h',      speed: 60,  steer:    0, hf: 350, hr: 350 },
-  { name: 'Rẽ phải vừa (40 km/h)',  speed: 40,  steer:   20, hf: 350, hr: 350 },
-  { name: 'Rẽ trái gắt (40 km/h)',  speed: 40,  steer: -40, hf: 350, hr: 350 },
-  { name: 'Cao tốc, chỉnh làn',       speed: 100, steer:   8, hf: 350, hr: 350 },
-  { name: 'Tải nặng phía sau',      speed: 50,  steer:   0, hf: 345, hr: 370 },
-  { name: 'Phanh gấp (đầu chúi)',   speed: 50,  steer:   0, hf: 365, hr: 340 },
-  { name: 'Đỗ xe, cua rất gấp',     speed: 3,   steer:  220, hf: 350, hr: 350 },
+  { name: 'Đi thẳng 60 km/h',         speed: 60, steer:    0, hf: 350, hr: 350 },
+  { name: 'Vào cua phải nhẹ',         speed: 60, steer:   18, hf: 350, hr: 350 },
+  { name: 'Vào cua trái nhẹ',         speed: 60, steer:  -18, hf: 350, hr: 350 },
+  { name: 'Vào cua phải vừa',         speed: 40, steer:   45, hf: 350, hr: 350 },
+  { name: 'Vào cua trái vừa',         speed: 40, steer:  -45, hf: 350, hr: 350 },
+  { name: 'Cua gắt phải',             speed: 20, steer:   90, hf: 350, hr: 350 },
+  { name: 'Cua gắt trái',             speed: 20, steer:  -90, hf: 350, hr: 350 },
+  { name: 'Tải nặng phía sau',        speed: 50, steer:    0, hf: 345, hr: 370 },
+  { name: 'Phanh gấp (đầu chúi)',     speed: 50, steer:    0, hf: 365, hr: 340 },
+  { name: 'Đỗ xe, cua rất gấp',       speed: 3,  steer:  220, hf: 350, hr: 350 },
 ];
+
+const ONCOMING_DISTANCES_M = [20, 30, 60, 100];
+let selectedOncomingDistanceM = 60;
 
 let timer = null;
 let activePreset = -1;
@@ -495,6 +524,26 @@ PRESETS.forEach((p, i) => {
   btn.addEventListener('click', () => applyPreset(i));
   presetBar.appendChild(btn);
 });
+
+const oncomingBar = $('oncoming-bar');
+ONCOMING_DISTANCES_M.forEach(distanceM => {
+  const btn = document.createElement('button');
+  btn.className = 'preset oncoming-distance';
+  btn.textContent = `${distanceM} m`;
+  btn.dataset.distanceM = distanceM;
+  btn.addEventListener('click', () => {
+    selectedOncomingDistanceM = distanceM;
+    updateOncomingDistanceHighlight();
+    queueSend();
+  });
+  oncomingBar.appendChild(btn);
+});
+
+function updateOncomingDistanceHighlight() {
+  document.querySelectorAll('.oncoming-distance').forEach(btn => {
+    btn.classList.toggle('active', Number(btn.dataset.distanceM) === selectedOncomingDistanceM);
+  });
+}
 
 function applyPreset(idx) {
   const p = PRESETS[idx];
@@ -577,6 +626,355 @@ function setInputPair(sliderId, rawValue) {
   return clamped;
 }
 
+
+// -----------------------------------------------------------------------------
+// Low-beam footprint top-view
+// Đây là hình học dashboard, không phải phân bố lux/candela. Quan trọng là:
+//  1) đường/làn xe giữ cố định,
+//  2) chùm sáng, cutoff và mốc 20/30/60 m dùng cùng một hệ tọa độ,
+//  3) xe đối diện được đặt theo đúng khoảng cách thật trên trục dọc.
+// -----------------------------------------------------------------------------
+const YAW_VIEW = {
+  x0: 280,      // screen x tại tim đường
+  y0: 620,      // screen y tại mũi xe mình / gốc chùm sáng
+  sx: 28,       // px/m ngang; dùng chung cho đường, xe và chùm sáng
+  sy: 5.2,      // px/m dọc; 60 m -> 312 px
+  ownLaneX: 1.85,
+  oncomingLaneX: -1.85,
+  laneWidthM: 3.7,
+  vehicleWidthM: 1.8,
+  vehicleLengthM: 4.4,
+  roadLengthM: 125,   // kéo mặt đường vượt khỏi khung để không lộ nắp/đường đóng ở mép trên
+  curveDisplayGain: 0.05,
+  curveDisplayClamp: 0.0014,
+};
+
+// Biên dạng chùm sáng được lấy lại theo contour của ảnh mẫu Wikimedia.
+// Hệ toạ độ local: x = ngang theo làn xe, y = khoảng cách phía trước xe.
+// Không còn chia scale riêng cho từng vùng; footprint dùng chung thước 0–60 m của dashboard.
+// Chú ý: đây vẫn là footprint nhìn từ trên xuống, không phải mô phỏng photometric/lux theo UNECE.
+const LOW_BEAM_MAIN_POLY = [
+  [-0.68, 0.00], [0.86, 0.00], [0.94, 0.30], [1.03, 1.30], [1.12, 3.20], [1.36, 7.20],
+  [1.66, 11.80], [1.98, 16.80], [2.32, 22.40], [2.62, 29.60],
+  [2.84, 37.80], [2.80, 46.20], [2.50, 54.60], [2.00, 62.50],
+  [1.36, 69.60], [0.56, 75.00], [-0.32, 78.40], [-0.98, 78.10],
+  [-1.46, 74.80], [-1.82, 68.10], [-2.05, 59.30], [-2.30, 49.30],
+  [-2.82, 40.00], [-3.50, 31.80], [-4.00, 27.20], [-4.08, 24.00],
+  [-3.86, 20.40], [-3.34, 15.00], [-2.56, 9.20], [-1.56, 4.00]
+];
+const LOW_BEAM_FAR_POLY = [];
+const LOW_BEAM_CUTOFF = [[-0.18, 0], [-0.42, 10], [-0.82, 20], [-1.02, 30], [-1.04, 60]];
+
+function yawDisplayDeg(realYawDeg) {
+  // Do trục X/Y trên dashboard dùng hai scale khác nhau (sx != sy),
+  // nếu quay trực tiếp theo real yaw thì góc nhìn sẽ bị phóng đại.
+  // Hàm này bù méo hình để góc hiển thị nhìn ra gần đúng với giá trị yaw thực.
+  const a = realYawDeg * Math.PI / 180;
+  return Math.atan((YAW_VIEW.sy / YAW_VIEW.sx) * Math.tan(a)) * 180 / Math.PI;
+}
+
+function spanAtDistance(poly, distM) {
+  const xs = [];
+  if (!poly || poly.length < 3) return null;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [x1, y1] = poly[j];
+    const [x2, y2] = poly[i];
+    if ((y1 <= distM && y2 >= distM) || (y2 <= distM && y1 >= distM)) {
+      const dy = y2 - y1;
+      if (Math.abs(dy) < 1e-9) {
+        xs.push(x1, x2);
+      } else {
+        const t = (distM - y1) / dy;
+        if (t >= -1e-6 && t <= 1 + 1e-6) xs.push(x1 + t * (x2 - x1));
+      }
+    }
+  }
+  if (xs.length < 2) return null;
+  xs.sort((a, b) => a - b);
+  return [xs[0], xs[xs.length - 1]];
+}
+
+function yawLocalToWorld(x, y, yawDeg) {
+  const a = yawDeg * Math.PI / 180;
+  const c = Math.cos(a), s = Math.sin(a);
+  return {
+    x: YAW_VIEW.ownLaneX + x * c + y * s,
+    y: y * c - x * s,
+  };
+}
+
+function worldToYawLocal(x, y, yawDeg) {
+  const a = yawDeg * Math.PI / 180;
+  const c = Math.cos(a), s = Math.sin(a);
+  const dx = x - YAW_VIEW.ownLaneX;
+  return {
+    x: c * dx - s * y,
+    y: s * dx + c * y,
+  };
+}
+
+function screenPointFromWorld(x, y) {
+  return {
+    x: YAW_VIEW.x0 + x * YAW_VIEW.sx,
+    y: YAW_VIEW.y0 - y * YAW_VIEW.sy,
+  };
+}
+
+function screenPointFromLocal(x, y, yawDeg) {
+  const w = yawLocalToWorld(x, y, yawDeg);
+  return screenPointFromWorld(w.x, w.y);
+}
+
+
+function pathFromWorldPolyline(points, closed = false, smooth = true) {
+  const pts = points.map(p => screenPointFromWorld(p.x, p.y));
+  if (pts.length === 0) return '';
+  if (!smooth || pts.length < 3) {
+    return pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ') + (closed ? ' Z' : '');
+  }
+  let d = `M${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[Math.min(pts.length - 1, i + 2)];
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
+  return d + (closed ? ' Z' : '');
+}
+
+function displayRoadCurvature(rawKappa) {
+  if (!Number.isFinite(rawKappa)) return 0;
+  const mag = Math.min(Math.abs(rawKappa) * YAW_VIEW.curveDisplayGain, YAW_VIEW.curveDisplayClamp);
+  return Math.sign(rawKappa) * mag;
+}
+
+function roadPoseAtDistance(distanceM, roadKappa) {
+  const k = Number.isFinite(roadKappa) ? roadKappa : 0;
+  if (Math.abs(k) < 1e-9) {
+    return { x: 0, y: distanceM, psi: 0, tx: 0, ty: 1, nx: 1, ny: 0 };
+  }
+  const psi = k * distanceM;
+  return {
+    x: (1 - Math.cos(psi)) / k,
+    y: Math.sin(psi) / k,
+    psi,
+    tx: Math.sin(psi),
+    ty: Math.cos(psi),
+    nx: Math.cos(psi),
+    ny: -Math.sin(psi),
+  };
+}
+
+function roadWorldPoint(distanceM, offsetRightM, roadKappa) {
+  const p = roadPoseAtDistance(distanceM, roadKappa);
+  return {
+    x: p.x + offsetRightM * p.nx,
+    y: p.y + offsetRightM * p.ny,
+    psi: p.psi,
+    tx: p.tx,
+    ty: p.ty,
+    nx: p.nx,
+    ny: p.ny,
+  };
+}
+
+function sampleRoadPolyline(offsetRightM, roadKappa, stepM = 4) {
+  const pts = [];
+  for (let s = 0; s <= YAW_VIEW.roadLengthM; s += stepM) {
+    pts.push(roadWorldPoint(s, offsetRightM, roadKappa));
+  }
+  if (pts[pts.length - 1].y < YAW_VIEW.roadLengthM - 0.01) {
+    pts.push(roadWorldPoint(YAW_VIEW.roadLengthM, offsetRightM, roadKappa));
+  }
+  return pts;
+}
+
+function pathFromLocalPolyline(points, yawDeg, closed = false, smooth = true) {
+  const pts = points.map(([x, y]) => screenPointFromLocal(x, y, yawDeg));
+  if (pts.length === 0) return '';
+  if (!smooth || pts.length < 3) {
+    return pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ') + (closed ? ' Z' : '');
+  }
+  let d = `M${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[Math.min(pts.length - 1, i + 2)];
+    const c1x = p1.x + (p2.x - p0.x) / 6;
+    const c1y = p1.y + (p2.y - p0.y) / 6;
+    const c2x = p2.x - (p3.x - p1.x) / 6;
+    const c2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
+  return d + (closed ? ' Z' : '');
+}
+
+function pointInPolygon(point, polygon) {
+  if (!polygon || polygon.length < 3) return false;
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i][0], yi = polygon[i][1];
+    const xj = polygon[j][0], yj = polygon[j][1];
+    const intersect = ((yi > point.y) !== (yj > point.y)) &&
+      (point.x < (xj - xi) * (point.y - yi) / ((yj - yi) || 1e-9) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function eyeBoxWorld(distanceM, roadKappa) {
+  const pose = roadWorldPoint(distanceM, YAW_VIEW.oncomingLaneX, roadKappa);
+  const halfW = 0.78;
+  const forward = { x: -pose.tx, y: -pose.ty };
+  const right = { x: pose.nx, y: pose.ny };
+  const eyeCenter = {
+    x: pose.x + forward.x * 1.0,
+    y: pose.y + forward.y * 1.0,
+  };
+  return [
+    { x: eyeCenter.x - right.x * halfW - forward.x * 0.35, y: eyeCenter.y - right.y * halfW - forward.y * 0.35 },
+    { x: eyeCenter.x + right.x * halfW - forward.x * 0.35, y: eyeCenter.y + right.y * halfW - forward.y * 0.35 },
+    { x: eyeCenter.x + right.x * halfW + forward.x * 0.35, y: eyeCenter.y + right.y * halfW + forward.y * 0.35 },
+    { x: eyeCenter.x - right.x * halfW + forward.x * 0.35, y: eyeCenter.y - right.y * halfW + forward.y * 0.35 },
+    eyeCenter,
+  ];
+}
+
+function assessGlare(yawDeg, distanceM, roadKappa) {
+  const eyeLocal = eyeBoxWorld(distanceM, roadKappa).map(p => worldToYawLocal(p.x, p.y, yawDeg));
+  const centerLocal = eyeLocal[4];
+  const eyeCenterHits = pointInPolygon(centerLocal, LOW_BEAM_MAIN_POLY);
+  const eyeCornerHits = eyeLocal.slice(0, 4).some(p => pointInPolygon(p, LOW_BEAM_MAIN_POLY));
+
+  const pose = roadWorldPoint(distanceM, YAW_VIEW.oncomingLaneX, roadKappa);
+  const forward = { x: -pose.tx, y: -pose.ty };
+  const right = { x: pose.nx, y: pose.ny };
+  const bodyLocal = [
+    { x: pose.x - right.x * 0.95 - forward.x * 1.8, y: pose.y - right.y * 0.95 - forward.y * 1.8 },
+    { x: pose.x + right.x * 0.95 - forward.x * 1.8, y: pose.y + right.y * 0.95 - forward.y * 1.8 },
+    { x: pose.x + right.x * 0.95 + forward.x * 0.4, y: pose.y + right.y * 0.95 + forward.y * 0.4 },
+    { x: pose.x - right.x * 0.95 + forward.x * 0.4, y: pose.y - right.y * 0.95 + forward.y * 0.4 },
+  ].map(p => worldToYawLocal(p.x, p.y, yawDeg));
+  const bodyHits = bodyLocal.some(p => pointInPolygon(p, LOW_BEAM_MAIN_POLY));
+
+  if (eyeCenterHits) {
+    return { level: 'danger', text: `NGUY CƠ — vùng mắt xe đối diện nằm trong footprint chùm sáng tại ${distanceM} m` };
+  }
+  if (eyeCornerHits) {
+    return { level: 'warn', text: `CẢNH BÁO — footprint đã chạm mép vùng mắt xe đối diện tại ${distanceM} m` };
+  }
+  if (bodyHits) {
+    return { level: 'warn', text: `CẢNH BÁO — footprint đã chạm thân/kính xe đối diện tại ${distanceM} m` };
+  }
+  return { level: 'ok', text: `OK — vùng mắt xe đối diện nằm ngoài footprint chùm sáng tại ${distanceM} m` };
+}
+
+function vehicleSvg(xWorld, yWorld, direction, label, labelColor, rotationDeg = 0) {
+  const w = YAW_VIEW.vehicleWidthM * YAW_VIEW.sx;
+  const l = YAW_VIEW.vehicleLengthM * YAW_VIEW.sy;
+  const c = screenPointFromWorld(xWorld, yWorld);
+  const x = c.x - w / 2;
+  const y = c.y - l / 2;
+  const frontY = direction === 'up' ? y : y + l;
+  const lampY = direction === 'up' ? y - 4 : y + l - 2;
+  const labelY = direction === 'up' ? y + l + 16 : y + l + 28;
+  const eyeY = direction === 'down' ? y + l - 11 : y + 11;
+  return `
+    <g transform="rotate(${rotationDeg.toFixed(2)} ${c.x.toFixed(1)} ${c.y.toFixed(1)})">
+      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${l.toFixed(1)}" rx="5" fill="#1f2937" stroke="#93a4bb" stroke-width="1.7"/>
+      <line x1="${(x + 10).toFixed(1)}" y1="${frontY.toFixed(1)}" x2="${(x + w - 10).toFixed(1)}" y2="${frontY.toFixed(1)}" stroke="#e5e7eb" stroke-width="1.1" opacity="0.65"/>
+      <rect x="${(x + 8).toFixed(1)}" y="${lampY.toFixed(1)}" width="13" height="7" rx="2" fill="#f59e0b" opacity="0.95"/>
+      <rect x="${(x + w - 21).toFixed(1)}" y="${lampY.toFixed(1)}" width="13" height="7" rx="2" fill="#f59e0b" opacity="0.95"/>
+      ${direction === 'down' ? `<rect x="${(c.x - 17).toFixed(1)}" y="${eyeY.toFixed(1)}" width="34" height="6" rx="2" fill="none" stroke="#ef4444" stroke-width="1.2"/>` : ''}
+    </g>
+    <text x="${c.x.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" fill="${labelColor}" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700">${label}</text>
+  `;
+}
+
+function drawYawScene(yawDeg, pitchDeg, rawRoadKappa) {
+  const drawYawDeg = yawDisplayDeg(yawDeg);
+  const roadKappa = displayRoadCurvature(rawRoadKappa);
+
+  const leftRoad = sampleRoadPolyline(-YAW_VIEW.laneWidthM, roadKappa);
+  const rightRoad = sampleRoadPolyline(YAW_VIEW.laneWidthM, roadKappa);
+  const roadCenter = sampleRoadPolyline(0, roadKappa);
+
+  $('road-fill').setAttribute('d', pathFromWorldPolyline([...leftRoad, ...rightRoad.slice().reverse()], true, true));
+  $('road-left-edge').setAttribute('d', pathFromWorldPolyline(leftRoad, false, true));
+  $('road-right-edge').setAttribute('d', pathFromWorldPolyline(rightRoad, false, true));
+  $('lane-center').setAttribute('d', pathFromWorldPolyline(roadCenter, false, true));
+
+  const guideMarks = [20, 30, 60];
+  $('road-distance-guides').innerHTML = guideMarks.map(m => {
+    const left = roadWorldPoint(m, -YAW_VIEW.laneWidthM, roadKappa);
+    const right = roadWorldPoint(m, YAW_VIEW.laneWidthM, roadKappa);
+    const a = screenPointFromWorld(left.x, left.y);
+    const b = screenPointFromWorld(right.x, right.y);
+    return `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}"/>`;
+  }).join('');
+
+  $('distance-scale').innerHTML = guideMarks.map(m => {
+    const edge = roadWorldPoint(m, YAW_VIEW.laneWidthM, roadKappa);
+    const tickStart = screenPointFromWorld(edge.x, edge.y);
+    const tickMid = screenPointFromWorld(edge.x + edge.nx * 0.42, edge.y + edge.ny * 0.42);
+    const textPt = screenPointFromWorld(edge.x + edge.nx * 0.78, edge.y + edge.ny * 0.78);
+    return `
+      <line x1="${tickStart.x.toFixed(1)}" y1="${tickStart.y.toFixed(1)}" x2="${tickMid.x.toFixed(1)}" y2="${tickMid.y.toFixed(1)}" stroke="#93a4bb" stroke-width="1"/>
+      <text x="${textPt.x.toFixed(1)}" y="${(textPt.y + 4).toFixed(1)}">${m} m</text>
+    `;
+  }).join('');
+
+  $('beam-main-shape').setAttribute('d', pathFromLocalPolyline(LOW_BEAM_MAIN_POLY, drawYawDeg, true, true));
+  $('beam-far-shape').setAttribute('d', '');
+  $('beam-cutoff-line').setAttribute('d', '');
+  $('beam-axis-line').setAttribute('x1', '0');
+  $('beam-axis-line').setAttribute('y1', '0');
+  $('beam-axis-line').setAttribute('x2', '0');
+  $('beam-axis-line').setAttribute('y2', '0');
+
+  const markYs = [20, 30, 60];
+  $('beam-marks').innerHTML = markYs.map(m => {
+    const span = spanAtDistance(LOW_BEAM_MAIN_POLY, m);
+    if (!span) return '';
+    const a = screenPointFromLocal(span[0], m, drawYawDeg);
+    const b = screenPointFromLocal(span[1], m, drawYawDeg);
+    return `<line x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}" stroke="#f4d35e" stroke-width="1.1" stroke-dasharray="4 4" opacity="0.92"/>`;
+  }).join('');
+
+  const ownPose = roadWorldPoint(-1.9, YAW_VIEW.ownLaneX, roadKappa);
+  const oncomingPose = roadWorldPoint(selectedOncomingDistanceM, YAW_VIEW.oncomingLaneX, roadKappa);
+  $('own-car').innerHTML = vehicleSvg(ownPose.x, ownPose.y, 'up', 'xe mình', '#cbd5e1', ownPose.psi * 180 / Math.PI);
+  $('oncoming-car').innerHTML = vehicleSvg(oncomingPose.x, oncomingPose.y, 'down', 'xe đối diện', '#ef4444', oncomingPose.psi * 180 / Math.PI);
+
+  // yaw arc: dùng cùng hệ trục màn hình để cung nhỏ không bị hiểu nhầm là footprint.
+  const arcAnchor = roadWorldPoint(0, YAW_VIEW.ownLaneX, roadKappa);
+  const cx = screenPointFromWorld(arcAnchor.x, arcAnchor.y).x;
+  const cy = screenPointFromWorld(arcAnchor.x, arcAnchor.y).y;
+  const r = 44;
+  const a0 = -Math.PI / 2;
+  const a1 = a0 + drawYawDeg * Math.PI / 180;
+  if (Math.abs(yawDeg) > 0.05) {
+    const s0 = { x: cx + r * Math.cos(a0), y: cy + r * Math.sin(a0) };
+    const s1 = { x: cx + r * Math.cos(a1), y: cy + r * Math.sin(a1) };
+    $('yaw-arc').setAttribute('d', `M${s0.x.toFixed(1)},${s0.y.toFixed(1)} A${r},${r} 0 0,${yawDeg >= 0 ? 1 : 0} ${s1.x.toFixed(1)},${s1.y.toFixed(1)}`);
+  } else {
+    $('yaw-arc').setAttribute('d', '');
+  }
+  $('yaw-angle-text').setAttribute('x', (cx + 72).toFixed(1));
+  $('yaw-angle-text').setAttribute('y', (cy - 42).toFixed(1));
+  $('yaw-angle-text').textContent = (yawDeg >= 0 ? '► ' : '◄ ') + Math.abs(yawDeg).toFixed(1) + '°';
+  $('viz-pitch-badge').textContent = Math.abs(pitchDeg) > 0.001 ? (pitchDeg > 0 ? '▲' : '▼') + ' ' + Math.abs(pitchDeg).toFixed(2) + '°' : '';
+
+  // Status text intentionally hidden to keep the top-view drawing clean.
+  $('beam-status-text').textContent = '';
+}
+
 function send() {
   const body = {
     speed_kmh:            +$('s-speed').value,
@@ -606,68 +1004,8 @@ function send() {
     $('g-yaw').textContent   = (yaw >= 0 ? '+' : '') + yaw.toFixed(3);
     $('g-pitch').textContent = (pitch >= 0 ? '+' : '') + pitch.toFixed(3);
 
-    // Beam visualization — two headlamp beams in top view
-    const beamLen = 340;
-    const halfSpread = 14;
-    const yawRad = yaw * Math.PI / 180;
-    const baseAngle = -Math.PI / 2; // pointing up
-    const beamCenter = baseAngle + yawRad;
-    const a1 = beamCenter - halfSpread * Math.PI / 180;
-    const a2 = beamCenter + halfSpread * Math.PI / 180;
-
-    [
-      { fanId: 'beam-left-fan', lineId: 'beam-left-center', ox: 188, oy: 361 },
-      { fanId: 'beam-right-fan', lineId: 'beam-right-center', ox: 212, oy: 361 },
-    ].forEach(({ fanId, lineId, ox, oy }) => {
-      const x1 = ox + beamLen * Math.cos(a1);
-      const y1 = oy + beamLen * Math.sin(a1);
-      const x2 = ox + beamLen * Math.cos(a2);
-      const y2 = oy + beamLen * Math.sin(a2);
-      const lx = ox + beamLen * Math.cos(beamCenter);
-      const ly = oy + beamLen * Math.sin(beamCenter);
-
-      $(fanId).setAttribute(
-        'd',
-        `M${ox},${oy} L${x1.toFixed(1)},${y1.toFixed(1)} A${beamLen},${beamLen} 0 0,1 ${x2.toFixed(1)},${y2.toFixed(1)} Z`
-      );
-      $(lineId).setAttribute('x1', ox.toFixed(1));
-      $(lineId).setAttribute('y1', oy.toFixed(1));
-      $(lineId).setAttribute('x2', lx.toFixed(1));
-      $(lineId).setAttribute('y2', ly.toFixed(1));
-    });
-
-    // Angle arc
-    const cx = 200, cy = 380;
-    const arcR = 100;
-    const arcA1 = -Math.PI / 2;
-    const arcA2 = -Math.PI / 2 + yawRad;
-    if (Math.abs(yaw) > 0.1) {
-      const ax1 = cx + arcR * Math.cos(arcA1);
-      const ay1 = cy + arcR * Math.sin(arcA1);
-      const ax2 = cx + arcR * Math.cos(arcA2);
-      const ay2 = cy + arcR * Math.sin(arcA2);
-      const sweep = yaw > 0 ? 1 : 0;
-      $('yaw-arc').setAttribute('d', `M${ax1.toFixed(1)},${ay1.toFixed(1)} A${arcR},${arcR} 0 0,${sweep} ${ax2.toFixed(1)},${ay2.toFixed(1)}`);
-    } else {
-      $('yaw-arc').setAttribute('d', '');
-    }
-
-    // Angle text
-    const labelR = 105;
-    const labelA = -Math.PI / 2 + yawRad / 2;
-    const lx = cx + labelR * Math.cos(labelA);
-    const ly = cy + labelR * Math.sin(labelA);
-    $('yaw-angle-text').setAttribute('x', lx.toFixed(0));
-    $('yaw-angle-text').setAttribute('y', ly.toFixed(0));
-    $('yaw-angle-text').textContent = Math.abs(yaw) > 0.01 ? (yaw > 0 ? '► ' : '◄ ') + Math.abs(yaw).toFixed(1) + '°' : '0°';
-
-    // Arrow indicator
-    $('yaw-arrow').setAttribute('x', lx.toFixed(0));
-    $('yaw-arrow').setAttribute('y', (ly - 16).toFixed(0));
-    $('yaw-arrow').textContent = '';
-
-    // Pitch badge on yaw viz
-    $('viz-pitch-badge').textContent = Math.abs(pitch) > 0.001 ? (pitch > 0 ? '▲' : '▼') + ' ' + Math.abs(pitch).toFixed(2) + '°' : '';
+    // Top-view yaw + low-beam footprint
+    drawYawScene(yaw, pitch, dbg.curvature_1pm);
 
     // Debug — Yaw
     $('d-fw').textContent     = dbg.front_wheel_deg.toFixed(3) + '°';
